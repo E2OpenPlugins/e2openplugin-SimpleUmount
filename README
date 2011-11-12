@@ -1,0 +1,19 @@
+                             <<< SimpleUmount >>>
+                         
+                                                                            
+  This file is open source software; you can redistribute it and/or modify
+     it under the terms of the GNU General Public License version 2 as
+               published by the Free Software Foundation.
+                                                                            
+
+Simple Enigma2 plugin extension to show list of mounted mass storage devices 
+and umount one of them with a simple [OK] click on remote.
+
+Useful if you insert a USB HDD or USB FLASH DRIVE and, before remove it,
+you MUST umount it to avoid filesystem damage
+
+AUTHOR: ambrosa
+EMAIL: aleambro@gmail.com
+
+Thanks to Skaman for suggestions
+
