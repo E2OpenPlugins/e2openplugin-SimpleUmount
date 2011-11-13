@@ -33,32 +33,30 @@ import os
 import re
 
 
-# --- Internationalization
+# --- Multilanguage support
 from Components.Language import language
 from Tools.Directories import resolveFilename, SCOPE_LANGUAGE, SCOPE_PLUGINS
 import gettext
 
-PluginLanguageDomain = "SimpleUmount"
-PluginLanguagePath = "Extensions/" + PluginLanguageDomain + "/po"
+PluginLanguageDomain = 'SimpleUmount'
+PluginLanguagePath = 'SystemPlugins/' + PluginLanguageDomain + '/po'
 
-def localeInit():
-	lang = language.getLanguage()[:2] # getLanguage returns e.g. "fi_FI" for "language_country"
-	os.environ["LANGUAGE"] = lang # Enigma doesn't set this (or LC_ALL, LC_MESSAGES, LANG). gettext needs it!
-	gettext.bindtextdomain(PluginLanguageDomain, resolveFilename(SCOPE_PLUGINS, PluginLanguagePath))
-	gettext.bindtextdomain('enigma2', resolveFilename(SCOPE_LANGUAGE, ""))
+lang = language.getLanguage()[:2] # getLanguage returns e.g. "fi_FI" for "language_country"
+os.environ['LANGUAGE'] = lang # Enigma doesn't set this (or LC_ALL, LC_MESSAGES, LANG). gettext needs it!
+gettext.bindtextdomain(PluginLanguageDomain, resolveFilename(SCOPE_PLUGINS, PluginLanguagePath))
+gettext.bindtextdomain('enigma2', resolveFilename(SCOPE_LANGUAGE, ''))
 
 def _(txt):
 	t = gettext.dgettext(PluginLanguageDomain, txt)
 	if t == txt:
 		# fallback to default translation for txt
-		t = gettext.dgettext("enigma2",txt)
+		t = gettext.dgettext('enigma2',txt)
 	return t
 
-localeInit()
 # -----------------------------------------------------------------
 
 # --- Init config
-from Components.config import KEY_LEFT, KEY_RIGHT, config, ConfigYesNo, NoSave, ConfigSelection, getConfigListEntry, ConfigSubsection, ConfigText
+from Components.config import KEY_LEFT, KEY_RIGHT, config, ConfigSubsection, ConfigYesNo
 from Components.ConfigList import ConfigList, ConfigListScreen
 
 config.plugins.simpleumount = ConfigSubsection()
