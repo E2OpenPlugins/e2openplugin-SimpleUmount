@@ -17,9 +17,9 @@
 #
 # AUTHOR: ambrosa  (thanks to Skaman for suggestions)
 # EMAIL: aleambro@gmail.com
-# VERSION : 0.05  2011-11-13
+# VERSION : 0.06  2011-11-13
 
-PLUGIN_VERSION = "0.05"
+PLUGIN_VERSION = "0.06"
 
 from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
@@ -69,7 +69,7 @@ class SimpleUmount(Screen):
 	global PLUGIN_VERSION
 	# plugin main screen (coord X,Y where 0,0 is upper left corner)
 	skin = """
-		<screen position="center,center" size="680,450" title="SimpleUmount rel. """ + PLUGIN_VERSION + """">
+		<screen position="center,center" size="680,450" title="SimpleUmount rel. %s">
 			<widget name="wdg_label_instruction" position="10,10" size="660,30" font="Regular;20" />
 			<widget name="wdg_label_legend_1" position="10,60" size="130,30" font="Regular;20" />
 			<widget name="wdg_label_legend_2" position="140,60" size="150,30" font="Regular;20" />
@@ -78,7 +78,7 @@ class SimpleUmount(Screen):
 			<widget name="wdg_menulist_device" position="10,90" size="660,300" font="Fixed;20" />
 			<widget name="wdg_config" position="10,410" size="660,30" font="Regular;20" />
 		</screen>
-		"""
+		""" % (PLUGIN_VERSION)
 
 	def __init__(self, session):
 
@@ -201,7 +201,7 @@ class SimpleUmount(Screen):
 						removable = 1
 
 				if config.plugins.simpleumount.showonlyremovable.value == 0 or removable == 1 :
-					self.list_dev.append([l[0]])
+					self.list_dev.append(l[0])
 					self.wdg_list_dev.append( "%-10s %-14s %-11s %8sMB" % (l[0], l[2], l[4]+','+l[5][1:3], size) )
 
 			self.noDeviceError = False
