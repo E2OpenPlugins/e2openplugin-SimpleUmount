@@ -17,9 +17,9 @@
 #
 # AUTHOR: ambrosa  (thanks to Skaman for suggestions)
 # EMAIL: aleambro@gmail.com
-# VERSION : 0.06  2011-11-13
+# VERSION : 0.07  2011-11-13
 
-PLUGIN_VERSION = "0.06"
+PLUGIN_VERSION = "0.07"
 
 from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
