@@ -17,9 +17,9 @@
 #
 # AUTHOR: ambrosa  (thanks to Skaman for suggestions)
 # EMAIL: aleambro@gmail.com
-# VERSION : 0.04  2011-11-12
+# VERSION : 0.05  2011-11-13
 
-PLUGIN_VERSION = "0.04"
+PLUGIN_VERSION = "0.05"
 
 from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
@@ -57,6 +57,13 @@ def _(txt):
 localeInit()
 # -----------------------------------------------------------------
 
+# --- Init config
+from Components.config import KEY_LEFT, KEY_RIGHT, config, ConfigYesNo, NoSave, ConfigSelection, getConfigListEntry, ConfigSubsection, ConfigText
+from Components.ConfigList import ConfigList, ConfigListScreen
+
+config.plugins.simpleumount = ConfigSubsection()
+config.plugins.simpleumount.showonlyremovable = ConfigYesNo(default = True)
+# -----------------------------------------------------------------
 
 # --- Main plugin code
 
@@ -64,13 +71,14 @@ class SimpleUmount(Screen):
 	global PLUGIN_VERSION
 	# plugin main screen (coord X,Y where 0,0 is upper left corner)
 	skin = """
-		<screen position="center,center" size="680,400" title="SimpleUmount rel. """ + PLUGIN_VERSION + """">
+		<screen position="center,center" size="680,450" title="SimpleUmount rel. """ + PLUGIN_VERSION + """">
 			<widget name="wdg_label_instruction" position="10,10" size="660,30" font="Regular;20" />
 			<widget name="wdg_label_legend_1" position="10,60" size="130,30" font="Regular;20" />
 			<widget name="wdg_label_legend_2" position="140,60" size="150,30" font="Regular;20" />
 			<widget name="wdg_label_legend_3" position="320,60" size="150,30" font="Regular;20" />
 			<widget name="wdg_label_legend_4" position="500,60" size="150,30" font="Regular;20" />
 			<widget name="wdg_menulist_device" position="10,90" size="660,300" font="Fixed;20" />
+			<widget name="wdg_config" position="10,410" size="660,30" font="Regular;20" />
 		</screen>
 		"""
 
@@ -83,8 +91,10 @@ class SimpleUmount(Screen):
 		# set buttons
 		self["actions"] = ActionMap( ["OkCancelActions", "DirectionActions"],
 						{
-						"cancel": self.Exit,
-						"ok": self.Umount,
+						"cancel": self.exitPlugin,
+						"ok": self.umountDevice,
+						"left": self.keyLeft,
+						"right": self.keyRight
 						},
 					 -1 )
 
@@ -100,13 +110,32 @@ class SimpleUmount(Screen):
 		self["wdg_menulist_device"] = MenuList( self.wdg_list_dev )
 		self.getDevicesList()
 
+		# I use configList (more complex approach) to be ready in future to add other config options
+		self.configList = []
+		self["wdg_config"] = ConfigList(self.configList, session = self.session)
+		self.configList.append( ( _("Show only removable devices"), config.plugins.simpleumount.showonlyremovable) )
+		self["wdg_config"].setList(self.configList)
 
-	def Exit(self):
-		print "[SimpleUmount] exit"
+
+	def keyLeft(self):
+			self["wdg_config"].handleKey(KEY_LEFT)
+			for x in self["wdg_config"].list:
+				x[1].save()
+			self.getDevicesList()
+
+
+	def keyRight(self):
+			self["wdg_config"].handleKey(KEY_RIGHT)
+			for x in self["wdg_config"].list:
+				x[1].save()
+			self.getDevicesList()
+
+
+	def exitPlugin(self):
 		self.close()
 
 
-	def umountConfirm(self, result):
+	def umountDeviceConfirm(self, result):
 		if result :
 			selected = self["wdg_menulist_device"].getSelectedIndex()
 			r = os.popen('umount -f %s 2>&1' % (self.list_dev[selected]), 'r' )
@@ -121,16 +150,24 @@ class SimpleUmount(Screen):
 		self.getDevicesList()
 
 
-	def Umount(self):
+	def umountDevice(self):
 		if self.noDeviceError == False :
 			selected = self["wdg_menulist_device"].getSelectedIndex()
-			self.session.openWithCallback(self.umountConfirm, MessageBox, text = _("Really umount device") + " " + self.list_dev[selected] + " ?", type = MessageBox.TYPE_YESNO, timeout = 10, default = False )
+			self.session.openWithCallback(self.umountDeviceConfirm, MessageBox, text = _("Really umount device") + " " + self.list_dev[selected] + " ?", type = MessageBox.TYPE_YESNO, timeout = 10, default = False )
 
 
 	def getDevicesList(self):
+		global config
+
 		self.wdg_list_dev = []
 		self.list_dev = []
+
+		# extract sd* mounted devices
 		r = os.popen('mount | grep "/dev/sd" | sort', 'r')
+		# expected output example:
+		#    /dev/sda6 on / type ext4 (rw,errors=remount-ro,commit=0)
+		#    /dev/sda7 on /home type ext4 (rw,commit=0)
+
 		lines = r.readlines()
 
 		if len(lines) == 0:
@@ -140,16 +177,37 @@ class SimpleUmount(Screen):
 		else:
 			for line in (lines):
 				l = re.split('\s+',line)
+
+				# extract device size
 				r2 = os.popen('df ' + l[0])
+				# expected output example:
+				#    File system         blocchi di 1K   Usati   Dispon. Uso% Montato su
+				#    /dev/sda6             28835836   4740816  22630240  18% /
+
 				lines2 = r2.readlines()
 				if len(lines2) > 1:
-					l2 = re.split('\s+',lines2[1])
-					size = int(l2[1])/1024
+					l2 = re.split('\s+', lines2[1])
+					size = int(l2[1]) / 1024
 				else:
 					size = "????"
 				r2.close()
-				self.list_dev.append(l[0])
-				self.wdg_list_dev.append( "%-10s %-14s %-11s %8sMB" % (l[0], l[2], l[4]+','+l[5][1:3], size) )
+
+				removable = 0
+				removable_path = "/sys/block/" + l[0][5:8] + "/removable"
+				if os.path.exists(removable_path) :
+					fd = open(removable_path, 'r')
+					stmp = str(fd.read())
+					stmp = stmp.strip('\n\r\t ')
+					fd.close()
+					if stmp == '1':
+						removable = 1
+					print "[SimpleUmount] stmp = -%s-" % (stmp)
+				print "[SimpleUmount] config = -%s-" % (config.plugins.simpleumount.showonlyremovable.value)
+				print "[SimpleUmount] removable -%s- = -%s-" % (l[0][5:8], removable)
+
+				if config.plugins.simpleumount.showonlyremovable.value == 0 or removable == 1 :
+					self.list_dev.append([l[0]])
+					self.wdg_list_dev.append( "%-10s %-14s %-11s %8sMB" % (l[0], l[2], l[4]+','+l[5][1:3], size) )
 
 			self.noDeviceError = False
 

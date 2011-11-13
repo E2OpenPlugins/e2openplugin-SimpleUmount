@@ -61,3 +61,6 @@ msgstr "forse non è inserito alcun device"
 msgid "Simple mass storage umounter extension"
 msgstr "Semplice umounter di supporti di memorizzazione di massa"
 
+msgid "Show only removable devices"
+msgstr "Mostra solo device rimovibili"
+
