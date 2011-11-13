@@ -201,9 +201,6 @@ class SimpleUmount(Screen):
 					fd.close()
 					if stmp == '1':
 						removable = 1
-					print "[SimpleUmount] stmp = -%s-" % (stmp)
-				print "[SimpleUmount] config = -%s-" % (config.plugins.simpleumount.showonlyremovable.value)
-				print "[SimpleUmount] removable -%s- = -%s-" % (l[0][5:8], removable)
 
 				if config.plugins.simpleumount.showonlyremovable.value == 0 or removable == 1 :
 					self.list_dev.append([l[0]])
