@@ -17,11 +17,12 @@
 #
 # AUTHOR: ambrosa  (thanks to Skaman for suggestions)
 # EMAIL: aleambro@gmail.com
-# VERSION : 0.07  2011-11-13
+# VERSION : 0.09  2011-11-17
 
-PLUGIN_VERSION = "0.07"
+PLUGIN_VERSION = "0.09"
 
 from Screens.Screen import Screen
+from Components.Console import Console
 from Screens.MessageBox import MessageBox
 from Plugins.Plugin import PluginDescriptor
 from Components.ActionMap import ActionMap
@@ -30,7 +31,7 @@ from Components.Label import Label
 from Components.MenuList import MenuList
 
 import os
-import re
+
 
 
 # --- Multilanguage support
@@ -39,7 +40,7 @@ from Tools.Directories import resolveFilename, SCOPE_LANGUAGE, SCOPE_PLUGINS
 import gettext
 
 PluginLanguageDomain = 'SimpleUmount'
-PluginLanguagePath = 'SystemPlugins/' + PluginLanguageDomain + '/po'
+PluginLanguagePath = 'Extensions/' + PluginLanguageDomain + '/po'
 
 lang = language.getLanguage()[:2] # getLanguage returns e.g. "fi_FI" for "language_country"
 os.environ['LANGUAGE'] = lang # Enigma doesn't set this (or LC_ALL, LC_MESSAGES, LANG). gettext needs it!
@@ -72,8 +73,8 @@ class SimpleUmount(Screen):
 		<screen position="center,center" size="680,450" title="SimpleUmount rel. %s">
 			<widget name="wdg_label_instruction" position="10,10" size="660,30" font="Regular;20" />
 			<widget name="wdg_label_legend_1" position="10,60" size="130,30" font="Regular;20" />
-			<widget name="wdg_label_legend_2" position="140,60" size="150,30" font="Regular;20" />
-			<widget name="wdg_label_legend_3" position="320,60" size="150,30" font="Regular;20" />
+			<widget name="wdg_label_legend_2" position="140,60" size="180,30" font="Regular;20" />
+			<widget name="wdg_label_legend_3" position="320,60" size="180,30" font="Regular;20" />
 			<widget name="wdg_label_legend_4" position="500,60" size="150,30" font="Regular;20" />
 			<widget name="wdg_menulist_device" position="10,90" size="660,300" font="Fixed;20" />
 			<widget name="wdg_config" position="10,410" size="660,30" font="Regular;20" />
@@ -134,24 +135,21 @@ class SimpleUmount(Screen):
 
 
 	def umountDeviceConfirm(self, result):
-		if result :
-			selected = self["wdg_menulist_device"].getSelectedIndex()
-			r = os.popen('umount -f %s 2>&1' % (self.list_dev[selected]), 'r' )
-			lines = r.readlines()
-			retcode = r.close()
-			if retcode != None:
-				errmsg = '\n\n' + _("umount return code") + ": %s" % (retcode)
-				for line in lines:
-					errmsg = errmsg + "\n" + line
-				self.session.open(MessageBox, text = _("Cannot umount device") + " " + self.list_dev[selected] + errmsg, type = MessageBox.TYPE_ERROR, timeout = 10)
+		if result == True :
+			Console().ePopen('umount -f %s 2>&1' % (self.list_dev[self.selectedDevice]), self.umountDeviceDone)
+
+	def umountDeviceDone(self, result, retval, extra_args):
+		if retval != 0:
+			errmsg = '\n\n' + _("umount return code") + ": %s\n%s" % (retval,result)
+			self.session.open(MessageBox, text = _("Cannot umount device") + " " + self.list_dev[self.selectedDevice] + errmsg, type = MessageBox.TYPE_ERROR, timeout = 10)
 
 		self.getDevicesList()
 
 
 	def umountDevice(self):
 		if self.noDeviceError == False :
-			selected = self["wdg_menulist_device"].getSelectedIndex()
-			self.session.openWithCallback(self.umountDeviceConfirm, MessageBox, text = _("Really umount device") + " " + self.list_dev[selected] + " ?", type = MessageBox.TYPE_YESNO, timeout = 10, default = False )
+			self.selectedDevice = self["wdg_menulist_device"].getSelectedIndex()
+			self.session.openWithCallback(self.umountDeviceConfirm, MessageBox, text = _("Really umount device") + " " + self.list_dev[self.selectedDevice] + " ?", type = MessageBox.TYPE_YESNO, timeout = 10, default = False )
 
 
 	def getDevicesList(self):
@@ -160,56 +158,54 @@ class SimpleUmount(Screen):
 		self.wdg_list_dev = []
 		self.list_dev = []
 
-		# extract sd* mounted devices
-		r = os.popen('mount | grep "/dev/sd" | sort', 'r')
-		# expected output example:
-		#    /dev/sda6 on / type ext4 (rw,errors=remount-ro,commit=0)
-		#    /dev/sda7 on /home type ext4 (rw,commit=0)
+		self.noDeviceError = False
 
-		lines = r.readlines()
-
-		if len(lines) == 0:
-			self.wdg_list_dev.append( _("WARNING: cannot read any mount point") )
-			self.wdg_list_dev.append( _("probably no mass storage device inserted") )
-			self.noDeviceError = True
-		else:
-			for line in (lines):
-				l = re.split('\s+',line)
-
-				# extract device size
-				r2 = os.popen('df ' + l[0])
+		# parsing /proc/mounts
+		file_mounts = '/proc/mounts'
+		if os.path.exists(file_mounts) :
+			fd = open(file_mounts,'r')
+			lines_mount = fd.readlines()
+			fd.close()
+			for line in lines_mount :
 				# expected output example:
-				#    File system         blocchi di 1K   Usati   Dispon. Uso% Montato su
-				#    /dev/sda6             28835836   4740816  22630240  18% /
+				# /dev/sda1 /media/hdd ext4 rw,relatime,barrier=1,data=ordered 0 0
+				l = line.split(' ')
 
-				lines2 = r2.readlines()
-				if len(lines2) > 1:
-					l2 = re.split('\s+', lines2[1])
-					size = int(l2[1]) / 1024
-				else:
-					size = "????"
-				r2.close()
+				# check only /dev/sd? devices
+				if l[0][:7] == '/dev/sd' :
+					device = l[0][5:8]
+					partition = l[0][5:9]
 
-				removable = 0
-				removable_path = "/sys/block/" + l[0][5:8] + "/removable"
-				if os.path.exists(removable_path) :
-					fd = open(removable_path, 'r')
-					stmp = str(fd.read())
-					stmp = stmp.strip('\n\r\t ')
-					fd.close()
-					if stmp == '1':
-						removable = 1
+					# get partition size
+					size = '????'
+					file_size = '/sys/block/%s/%s/size' % (device,partition)
+					if os.path.exists(file_size) :
+						fd = open(file_size,'r')
+						size = fd.read()
+						fd.close()
+						size = size.strip('\n\r\t ')
+						# partition size is in 512 bytes chunk
+						size = int(size) / 2048 # size in MB
 
-				if config.plugins.simpleumount.showonlyremovable.value == 0 or removable == 1 :
-					self.list_dev.append(l[0])
-					self.wdg_list_dev.append( "%-10s %-14s %-11s %8sMB" % (l[0], l[2], l[4]+','+l[5][1:3], size) )
+					# get 'removable' flag
+					removable = '0'
+					file_removable = '/sys/block/%s/removable' % (device)
+					if os.path.exists(file_removable) :
+						fd = open(file_removable, 'r')
+						removable = fd.read()
+						fd.close()
+						removable = removable.strip('\n\r\t ')
 
-			self.noDeviceError = False
+					# add entry in device list
+					if config.plugins.simpleumount.showonlyremovable.value == 0 or removable == '1' :
+						self.list_dev.append(l[0])
+						self.wdg_list_dev.append( "%-10s %-14s %-11s %8sMB" % (l[0], l[1], l[2]+','+l[3][:2], size) )
 
-		r.close()
+		if len(self.list_dev) == 0:
+			self.noDeviceError = True
+
 		self["wdg_menulist_device"].setList(self.wdg_list_dev)
 
-		return
 
 # ----------------------------------------------------------------------------------
 
