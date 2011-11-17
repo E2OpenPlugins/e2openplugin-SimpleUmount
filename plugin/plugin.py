@@ -18,6 +18,9 @@
 # AUTHOR: ambrosa  (thanks to Skaman for suggestions)
 # EMAIL: aleambro@gmail.com
 # VERSION : 0.09  2011-11-17
+#
+# GitHub repo: https://github.com/ambrosa/e2openplugin-SimpleUmount
+#
 
 PLUGIN_VERSION = "0.09"
 
