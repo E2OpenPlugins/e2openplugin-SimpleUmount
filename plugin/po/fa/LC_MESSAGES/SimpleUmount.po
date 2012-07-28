@@ -1,0 +1,62 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: simple umount Persian Translation\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-11-12 15:57+0100\n"
+"PO-Revision-Date: 2012-07-28 20:21+0330\n"
+"Last-Translator: Persian Prince <persianprince@persianpros.org>\n"
+"Language-Team: Persian Professionals <persianpros@yahoo.com>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Persian\n"
+"X-Poedit-Country: IRAN, ISLAMIC REPUBLIC OF\n"
+
+#: plugin.py:65
+msgid "Select device and press OK to umount or EXIT to quit"
+msgstr "دستگاه خود را انتخاب نمایید و با فشردن دکمه اوکی آنرا از حالت مونت در بیاورید و یا باز زدن دکمه خروج از این صفحه خارج شوید"
+
+#: plugin.py:66
+msgid "DEVICE"
+msgstr "دستگاه الکترونیکی"
+
+#: plugin.py:67
+msgid "MOUNTED ON"
+msgstr "مونت شده در"
+
+#: plugin.py:68
+msgid "TYPE"
+msgstr "نوع"
+
+#: plugin.py:69
+msgid "SIZE"
+msgstr "اندازه"
+
+#: plugin.py:90
+msgid "umount return code"
+msgstr "کد بازگشت از مونت درآمدن"
+
+#: plugin.py:93
+msgid "Cannot umount device"
+msgstr "سیستم نمی تواند دستگاه الکترونیکی شما را از مونت در بیاورد"
+
+#: plugin.py:101
+msgid "Really umount device"
+msgstr "آیا واقعا قصد از مونت درآوردن دستگاه الکترونیکی خود را دارید"
+
+#: plugin.py:111
+msgid "WARNING: cannot read any mount point"
+msgstr "احتیاط : سیستم نمی تواند هیچ دستگاه مونت شده ای را فراخوانی کند"
+
+#: plugin.py:112
+msgid "probably no mass storage device inserted"
+msgstr "احتمالا هیچ دستگاه الکترونیکی ( انباره الکترونیکی ) وارد نشده است  "
+
+#: plugin.py:145
+msgid "Simple mass storage umounter extension"
+msgstr ""
+
+msgid "Show only removable devices"
+msgstr "فقط نمایش دادن دستگاه های الکترونیکی برداشتنی"
+
