@@ -22,8 +22,8 @@
 # GitHub repo: https://github.com/ambrosa/e2openplugin-SimpleUmount
 #
 
-PLUGIN_VERSION = "0.09"
-
+PLUGIN_VERSION = "0.10"
+from . import _
 from Screens.Screen import Screen
 from Components.Console import Console
 from Screens.MessageBox import MessageBox
@@ -35,31 +35,6 @@ from Components.MenuList import MenuList
 
 import os
 
-
-
-# --- Multilanguage support
-from Components.Language import language
-from Tools.Directories import resolveFilename, SCOPE_LANGUAGE, SCOPE_PLUGINS
-import gettext
-
-PluginLanguageDomain = 'SimpleUmount'
-PluginLanguagePath = 'Extensions/' + PluginLanguageDomain + '/po'
-
-lang = language.getLanguage()[:2] # getLanguage returns e.g. "fi_FI" for "language_country"
-os.environ['LANGUAGE'] = lang # Enigma doesn't set this (or LC_ALL, LC_MESSAGES, LANG). gettext needs it!
-gettext.bindtextdomain(PluginLanguageDomain, resolveFilename(SCOPE_PLUGINS, PluginLanguagePath))
-gettext.bindtextdomain('enigma2', resolveFilename(SCOPE_LANGUAGE, ''))
-
-def _(txt):
-	t = gettext.dgettext(PluginLanguageDomain, txt)
-	if t == txt:
-		# fallback to default translation for txt
-		t = gettext.dgettext('enigma2',txt)
-	return t
-
-# -----------------------------------------------------------------
-
-# --- Init config
 from Components.config import KEY_LEFT, KEY_RIGHT, config, ConfigSubsection, ConfigYesNo
 from Components.ConfigList import ConfigList, ConfigListScreen
 
@@ -216,13 +191,8 @@ def main(session, **kwargs):
 	session.open(SimpleUmount)
 
 def Plugins(**kwargs):
-	global PLUGIN_VERSION
-
-	plug = list()
-	plug.append( PluginDescriptor(name = "SimpleUmount", 
-			description = _("Simple mass storage umounter extension"), 
-			where = PluginDescriptor.WHERE_EXTENSIONSMENU, fnc=main) )
-
-	return plug
+	l = []
+	l.append(PluginDescriptor(name=_("SimpleUmount"), description = _("Simple mass storage umounter extension"), icon="simpleumount.png", where = PluginDescriptor.WHERE_PLUGINMENU, fnc=main))
+	return l
 
 
