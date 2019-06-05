@@ -84,6 +84,7 @@ class SimpleUmount(Screen):
 		self.wdg_list_dev = []
 		self.list_dev = []
 		self.noDeviceError = True
+		self.in_umount = False
 		self["wdg_menulist_device"] = MenuList(self.wdg_list_dev)
 		self.getDevicesList()
 
@@ -109,11 +110,13 @@ class SimpleUmount(Screen):
 
 
 	def exitPlugin(self):
-		self.close()
+		if not self.in_umount:
+			self.close()
 
 
 	def umountDeviceConfirm(self, result):
 		if result == True :
+			self.in_umount = True
 			Console().ePopen('umount -f %s 2>&1' % (self.list_dev[self.selectedDevice]), self.umountDeviceDone)
 
 
@@ -123,6 +126,7 @@ class SimpleUmount(Screen):
 			self.session.open(MessageBox, text = _("Cannot umount device") + " " + self.list_dev[self.selectedDevice] + errmsg, type = MessageBox.TYPE_ERROR, timeout = 10)
 
 		self.getDevicesList()
+		self.in_umount = False
 
 
 	def umountDevice(self):
