@@ -22,7 +22,7 @@
 # GitHub repo: https://github.com/ambrosa/e2openplugin-SimpleUmount
 #
 
-PLUGIN_VERSION = "0.10"
+PLUGIN_VERSION = "0.11"
 from . import _
 from Screens.Screen import Screen
 from Components.Console import Console
