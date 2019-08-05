@@ -2,14 +2,14 @@
 
 #
 #                             <<< SimpleUmount >>>
-#                         
-#                                                                            
+#
+#
 #  This file is open source software; you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License version 2 as
 #               published by the Free Software Foundation.
-#                                                                            
 #
-# Simple Enigma2 plugin extension to show list of mounted mass storage devices 
+#
+# Simple Enigma2 plugin extension to show list of mounted mass storage devices
 # and umount one of them with a simple [OK] click on remote.
 #
 # Useful if you insert a USB HDD or USB FLASH DRIVE and, before remove it,
@@ -22,7 +22,7 @@
 # GitHub repo: https://github.com/ambrosa/e2openplugin-SimpleUmount
 #
 
-PLUGIN_VERSION = "0.10"
+PLUGIN_VERSION = "0.11"
 from . import _
 from Screens.Screen import Screen
 from Components.Console import Console
@@ -66,62 +66,67 @@ class SimpleUmount(Screen):
 		self.session = session
 
 		# set buttons
-		self["actions"] = ActionMap( ["OkCancelActions", "DirectionActions"],
+		self["actions"] = ActionMap(["OkCancelActions", "DirectionActions"],
 						{
 						"cancel": self.exitPlugin,
 						"ok": self.umountDevice,
 						"left": self.keyLeft,
 						"right": self.keyRight
 						},
-					 -1 )
+					 -1)
 
-		self["wdg_label_instruction"] = Label( _("Select device and press OK to umount or EXIT to quit") )
-		self["wdg_label_legend_1"] = Label( _("DEVICE") )
-		self["wdg_label_legend_2"] = Label( _("MOUNTED ON") )
-		self["wdg_label_legend_3"] = Label( _("TYPE") )
-		self["wdg_label_legend_4"] = Label( _("SIZE") )
+		self["wdg_label_instruction"] = Label(_("Select device and press OK to umount or EXIT to quit"))
+		self["wdg_label_legend_1"] = Label(_("DEVICE"))
+		self["wdg_label_legend_2"] = Label(_("MOUNTED ON"))
+		self["wdg_label_legend_3"] = Label(_("TYPE"))
+		self["wdg_label_legend_4"] = Label(_("SIZE"))
 
 		self.wdg_list_dev = []
 		self.list_dev = []
 		self.noDeviceError = True
-		self["wdg_menulist_device"] = MenuList( self.wdg_list_dev )
+		self.in_umount = False
+		self["wdg_menulist_device"] = MenuList(self.wdg_list_dev)
 		self.getDevicesList()
 
 		# I use configList (more complex approach) to be ready in future to add other config options
 		self.configList = []
 		self["wdg_config"] = ConfigList(self.configList, session = self.session)
-		self.configList.append( ( _("Show only removable devices"), config.plugins.simpleumount.showonlyremovable) )
+		self.configList.append((_("Show only removable devices"), config.plugins.simpleumount.showonlyremovable))
 		self["wdg_config"].setList(self.configList)
 
 
 	def keyLeft(self):
-			self["wdg_config"].handleKey(KEY_LEFT)
-			for x in self["wdg_config"].list:
-				x[1].save()
-			self.getDevicesList()
+		self["wdg_config"].handleKey(KEY_LEFT)
+		for x in self["wdg_config"].list:
+			x[1].save()
+		self.getDevicesList()
 
 
 	def keyRight(self):
-			self["wdg_config"].handleKey(KEY_RIGHT)
-			for x in self["wdg_config"].list:
-				x[1].save()
-			self.getDevicesList()
+		self["wdg_config"].handleKey(KEY_RIGHT)
+		for x in self["wdg_config"].list:
+			x[1].save()
+		self.getDevicesList()
 
 
 	def exitPlugin(self):
-		self.close()
+		if not self.in_umount:
+			self.close()
 
 
 	def umountDeviceConfirm(self, result):
 		if result == True :
+			self.in_umount = True
 			Console().ePopen('umount -f %s 2>&1' % (self.list_dev[self.selectedDevice]), self.umountDeviceDone)
+
 
 	def umountDeviceDone(self, result, retval, extra_args):
 		if retval != 0:
-			errmsg = '\n\n' + _("umount return code") + ": %s\n%s" % (retval,result)
+			errmsg = '\n\n' + _("umount return code") + ": %s\n%s" % (retval, result)
 			self.session.open(MessageBox, text = _("Cannot umount device") + " " + self.list_dev[self.selectedDevice] + errmsg, type = MessageBox.TYPE_ERROR, timeout = 10)
 
 		self.getDevicesList()
+		self.in_umount = False
 
 
 	def umountDevice(self):
@@ -141,7 +146,7 @@ class SimpleUmount(Screen):
 		# parsing /proc/mounts
 		file_mounts = '/proc/mounts'
 		if os.path.exists(file_mounts) :
-			fd = open(file_mounts,'r')
+			fd = open(file_mounts, 'r')
 			lines_mount = fd.readlines()
 			fd.close()
 			for line in lines_mount :
@@ -156,14 +161,14 @@ class SimpleUmount(Screen):
 
 					# get partition size
 					size = '????'
-					file_size = '/sys/block/%s/%s/size' % (device,partition)
+					file_size = '/sys/block/%s/%s/size' % (device, partition)
 					if os.path.exists(file_size) :
-						fd = open(file_size,'r')
+						fd = open(file_size, 'r')
 						size = fd.read()
 						fd.close()
-						size = size.strip('\n\r\t ')
+						size = size.strip()
 						# partition size is in 512 bytes chunk
-						size = int(size) / 2048 # size in MB
+						size = int(size) / 2048 # size in MiB
 
 					# get 'removable' flag
 					removable = '0'
@@ -172,12 +177,12 @@ class SimpleUmount(Screen):
 						fd = open(file_removable, 'r')
 						removable = fd.read()
 						fd.close()
-						removable = removable.strip('\n\r\t ')
+						removable = removable.strip()
 
 					# add entry in device list
 					if config.plugins.simpleumount.showonlyremovable.value == 0 or removable == '1' :
 						self.list_dev.append(l[0])
-						self.wdg_list_dev.append( "%-10s %-14s %-11s %8sMB" % (l[0], l[1], l[2]+','+l[3][:2], size) )
+						self.wdg_list_dev.append("%-10s %-14s %-11s %8s MiB" % (l[0], l[1], l[2]+','+l[3][:2], size))
 
 		if len(self.list_dev) == 0:
 			self.noDeviceError = True
@@ -192,7 +197,5 @@ def main(session, **kwargs):
 
 def Plugins(**kwargs):
 	l = []
-	l.append(PluginDescriptor(name=_("SimpleUmount"), description = _("Simple mass storage umounter extension"), icon="simpleumount.png", where = PluginDescriptor.WHERE_PLUGINMENU, fnc=main))
+	l.append(PluginDescriptor(name=_("SimpleUmount"), description=_("Simple mass storage umounter extension"), icon="simpleumount.png", where=PluginDescriptor.WHERE_PLUGINMENU, fnc=main))
 	return l
-
-
