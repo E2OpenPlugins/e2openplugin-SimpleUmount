@@ -22,6 +22,7 @@
 # GitHub repo: https://github.com/ambrosa/e2openplugin-SimpleUmount
 #
 
+from __future__ import print_function
 PLUGIN_VERSION = "0.11"
 from . import _
 from Screens.Screen import Screen
@@ -61,7 +62,7 @@ class SimpleUmount(Screen):
 
 	def __init__(self, session):
 
-		print "[SimpleUmount] ++ START PLUGIN ++"
+		print("[SimpleUmount] ++ START PLUGIN ++")
 		Screen.__init__(self, session)
 		self.session = session
 
