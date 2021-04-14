@@ -182,7 +182,7 @@ class SimpleUmount(Screen):
 					# add entry in device list
 					if config.plugins.simpleumount.showonlyremovable.value == 0 or removable == '1':
 						self.list_dev.append(l[0])
-						self.wdg_list_dev.append("%-10s %-14s %-11s %8s MiB" % (l[0], l[1], l[2]+','+l[3][:2], size))
+						self.wdg_list_dev.append("%-10s %-14s %-11s %8s MiB" % (l[0], l[1], l[2] + ',' + l[3][:2], size))
 
 		if len(self.list_dev) == 0:
 			self.noDeviceError = True
