@@ -39,7 +39,7 @@ from Components.config import KEY_LEFT, KEY_RIGHT, config, ConfigSubsection, Con
 from Components.ConfigList import ConfigList, ConfigListScreen
 
 config.plugins.simpleumount = ConfigSubsection()
-config.plugins.simpleumount.showonlyremovable = ConfigYesNo(default = True)
+config.plugins.simpleumount.showonlyremovable = ConfigYesNo(default=True)
 # -----------------------------------------------------------------
 
 # --- Main plugin code
@@ -90,7 +90,7 @@ class SimpleUmount(Screen):
 
 		# I use configList (more complex approach) to be ready in future to add other config options
 		self.configList = []
-		self["wdg_config"] = ConfigList(self.configList, session = self.session)
+		self["wdg_config"] = ConfigList(self.configList, session=self.session)
 		self.configList.append((_("Show only removable devices"), config.plugins.simpleumount.showonlyremovable))
 		self["wdg_config"].setList(self.configList)
 
@@ -123,7 +123,7 @@ class SimpleUmount(Screen):
 	def umountDeviceDone(self, result, retval, extra_args):
 		if retval != 0:
 			errmsg = '\n\n' + _("umount return code") + ": %s\n%s" % (retval, result)
-			self.session.open(MessageBox, text = _("Cannot umount device") + " " + self.list_dev[self.selectedDevice] + errmsg, type = MessageBox.TYPE_ERROR, timeout = 10)
+			self.session.open(MessageBox, text=_("Cannot umount device") + " " + self.list_dev[self.selectedDevice] + errmsg, type=MessageBox.TYPE_ERROR, timeout=10)
 
 		self.getDevicesList()
 		self.in_umount = False
@@ -132,7 +132,7 @@ class SimpleUmount(Screen):
 	def umountDevice(self):
 		if self.noDeviceError == False :
 			self.selectedDevice = self["wdg_menulist_device"].getSelectedIndex()
-			self.session.openWithCallback(self.umountDeviceConfirm, MessageBox, text = _("Really umount device") + " " + self.list_dev[self.selectedDevice] + " ?", type = MessageBox.TYPE_YESNO, timeout = 10, default = False )
+			self.session.openWithCallback(self.umountDeviceConfirm, MessageBox, text=_("Really umount device") + " " + self.list_dev[self.selectedDevice] + " ?", type=MessageBox.TYPE_YESNO, timeout=10, default=False )
 
 
 	def getDevicesList(self):
