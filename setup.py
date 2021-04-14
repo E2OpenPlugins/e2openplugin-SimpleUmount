@@ -10,4 +10,3 @@ setup(name='enigma2-plugin-extensions-simpleumount',
 	package_data={pkg: ['locale/*/LC_MESSAGES/*.mo', 'simpleumount.png']},
 	cmdclass=setup_translate.cmdclass, # for translation
 	)
-
