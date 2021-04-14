@@ -115,7 +115,7 @@ class SimpleUmount(Screen):
 
 
 	def umountDeviceConfirm(self, result):
-		if result == True :
+		if result == True:
 			self.in_umount = True
 			Console().ePopen('umount -f %s 2>&1' % (self.list_dev[self.selectedDevice]), self.umountDeviceDone)
 
@@ -130,9 +130,9 @@ class SimpleUmount(Screen):
 
 
 	def umountDevice(self):
-		if self.noDeviceError == False :
+		if self.noDeviceError == False:
 			self.selectedDevice = self["wdg_menulist_device"].getSelectedIndex()
-			self.session.openWithCallback(self.umountDeviceConfirm, MessageBox, text=_("Really umount device") + " " + self.list_dev[self.selectedDevice] + " ?", type=MessageBox.TYPE_YESNO, timeout=10, default=False )
+			self.session.openWithCallback(self.umountDeviceConfirm, MessageBox, text=_("Really umount device") + " " + self.list_dev[self.selectedDevice] + " ?", type=MessageBox.TYPE_YESNO, timeout=10, default=False)
 
 
 	def getDevicesList(self):
@@ -145,24 +145,24 @@ class SimpleUmount(Screen):
 
 		# parsing /proc/mounts
 		file_mounts = '/proc/mounts'
-		if os.path.exists(file_mounts) :
+		if os.path.exists(file_mounts):
 			fd = open(file_mounts, 'r')
 			lines_mount = fd.readlines()
 			fd.close()
-			for line in lines_mount :
+			for line in lines_mount:
 				# expected output example:
 				# /dev/sda1 /media/hdd ext4 rw,relatime,barrier=1,data=ordered 0 0
 				l = line.split(' ')
 
 				# check only /dev/sd? devices
-				if l[0][:7] == '/dev/sd' :
+				if l[0][:7] == '/dev/sd':
 					device = l[0][5:8]
 					partition = l[0][5:9]
 
 					# get partition size
 					size = '????'
 					file_size = '/sys/block/%s/%s/size' % (device, partition)
-					if os.path.exists(file_size) :
+					if os.path.exists(file_size):
 						fd = open(file_size, 'r')
 						size = fd.read()
 						fd.close()
@@ -173,14 +173,14 @@ class SimpleUmount(Screen):
 					# get 'removable' flag
 					removable = '0'
 					file_removable = '/sys/block/%s/removable' % (device)
-					if os.path.exists(file_removable) :
+					if os.path.exists(file_removable):
 						fd = open(file_removable, 'r')
 						removable = fd.read()
 						fd.close()
 						removable = removable.strip()
 
 					# add entry in device list
-					if config.plugins.simpleumount.showonlyremovable.value == 0 or removable == '1' :
+					if config.plugins.simpleumount.showonlyremovable.value == 0 or removable == '1':
 						self.list_dev.append(l[0])
 						self.wdg_list_dev.append("%-10s %-14s %-11s %8s MiB" % (l[0], l[1], l[2]+','+l[3][:2], size))
 

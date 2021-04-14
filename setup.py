@@ -2,7 +2,7 @@ from distutils.core import setup
 import setup_translate
 
 pkg = 'Extensions.SimpleUmount'
-setup (name='enigma2-plugin-extensions-simpleumount',
+setup(name='enigma2-plugin-extensions-simpleumount',
 	version='0.10',
 	description='Simple umounter mass storage device',
 	packages=[pkg],
