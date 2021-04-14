@@ -44,6 +44,7 @@ config.plugins.simpleumount.showonlyremovable = ConfigYesNo(default=True)
 
 # --- Main plugin code
 
+
 class SimpleUmount(Screen):
 	global PLUGIN_VERSION
 	# plugin main screen (coord X,Y where 0,0 is upper left corner)
@@ -94,13 +95,11 @@ class SimpleUmount(Screen):
 		self.configList.append((_("Show only removable devices"), config.plugins.simpleumount.showonlyremovable))
 		self["wdg_config"].setList(self.configList)
 
-
 	def keyLeft(self):
 		self["wdg_config"].handleKey(KEY_LEFT)
 		for x in self["wdg_config"].list:
 			x[1].save()
 		self.getDevicesList()
-
 
 	def keyRight(self):
 		self["wdg_config"].handleKey(KEY_RIGHT)
@@ -108,17 +107,14 @@ class SimpleUmount(Screen):
 			x[1].save()
 		self.getDevicesList()
 
-
 	def exitPlugin(self):
 		if not self.in_umount:
 			self.close()
-
 
 	def umountDeviceConfirm(self, result):
 		if result == True:
 			self.in_umount = True
 			Console().ePopen('umount -f %s 2>&1' % (self.list_dev[self.selectedDevice]), self.umountDeviceDone)
-
 
 	def umountDeviceDone(self, result, retval, extra_args):
 		if retval != 0:
@@ -128,12 +124,10 @@ class SimpleUmount(Screen):
 		self.getDevicesList()
 		self.in_umount = False
 
-
 	def umountDevice(self):
 		if self.noDeviceError == False:
 			self.selectedDevice = self["wdg_menulist_device"].getSelectedIndex()
 			self.session.openWithCallback(self.umountDeviceConfirm, MessageBox, text=_("Really umount device") + " " + self.list_dev[self.selectedDevice] + " ?", type=MessageBox.TYPE_YESNO, timeout=10, default=False)
-
 
 	def getDevicesList(self):
 		global config
@@ -194,6 +188,7 @@ class SimpleUmount(Screen):
 
 def main(session, **kwargs):
 	session.open(SimpleUmount)
+
 
 def Plugins(**kwargs):
 	l = []
