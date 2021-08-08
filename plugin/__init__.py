@@ -21,3 +21,4 @@ def _(txt):
 
 
 language.addCallback(localeInit)
+localeInit()
