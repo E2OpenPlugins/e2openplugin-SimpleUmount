@@ -1,66 +1,70 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Signed-off-by: Dario Croci <spaeleus@croci.org>
 #
-#, fuzzy
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR Dario Croci <spaeleus@croci.org>
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: SimpleUmont\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-11-12 15:57+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2022-01-28 15:32+0100\n"
+"PO-Revision-Date: 2022-01-28 15:36+0100\n"
+"Last-Translator: Dario Croci <spaeleus@croci.org>\n"
+"Language-Team: Dario Croci <spaeleus@croci.org>\n"
+"Language: it_IT\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Basepath: ../../../../../../../..\n"
+"X-Generator: Poedit 3.0.1\n"
+"X-Poedit-SearchPath-0: .\n"
 
-#: plugin.py:65
+#: usr/lib/enigma2/python/Plugins/Extensions/SimpleUmount/plugin.py:79
 msgid "Select device and press OK to umount or EXIT to quit"
-msgstr "Seleziona device e premi OK o premi EXIT per uscire"
+msgstr "Selezionare il dispositivo poi OK per smontare - EXIT per uscire"
 
-#: plugin.py:66
+#: usr/lib/enigma2/python/Plugins/Extensions/SimpleUmount/plugin.py:80
 msgid "DEVICE"
-msgstr "DEVICE"
+msgstr "DISPOSITIVO"
 
-#: plugin.py:67
+#: usr/lib/enigma2/python/Plugins/Extensions/SimpleUmount/plugin.py:81
 msgid "MOUNTED ON"
 msgstr "MONTATO IN"
 
-#: plugin.py:68
+#: usr/lib/enigma2/python/Plugins/Extensions/SimpleUmount/plugin.py:82
 msgid "TYPE"
 msgstr "TIPO"
 
-#: plugin.py:69
+#: usr/lib/enigma2/python/Plugins/Extensions/SimpleUmount/plugin.py:83
 msgid "SIZE"
 msgstr "DIMENSIONE"
 
-#: plugin.py:90
-msgid "umount return code"
-msgstr "errore umount nr."
-
-#: plugin.py:93
-msgid "Cannot umount device"
-msgstr "Impossibile smontare il device"
-
-#: plugin.py:101
-msgid "Really umount device"
-msgstr "Vuoi veramente smontare il device"
-
-#: plugin.py:111
-msgid "WARNING: cannot read any mount point"
-msgstr "WARNING: non leggo nessun punto di mount"
-
-#: plugin.py:112
-msgid "probably no mass storage device inserted"
-msgstr "forse non è inserito alcun device"
-
-#: plugin.py:145
-msgid "Simple mass storage umounter extension"
-msgstr "Semplice umounter di supporti di memorizzazione di massa"
-
+#: usr/lib/enigma2/python/Plugins/Extensions/SimpleUmount/plugin.py:95
 msgid "Show only removable devices"
-msgstr "Mostra solo device rimovibili"
+msgstr "Mostrare solo dispositivi rimovibili"
 
+#: usr/lib/enigma2/python/Plugins/Extensions/SimpleUmount/plugin.py:121
+msgid "umount return code"
+msgstr "Codice di ritorno umount"
+
+#: usr/lib/enigma2/python/Plugins/Extensions/SimpleUmount/plugin.py:122
+msgid "Cannot umount device"
+msgstr "Impossibile smontare il dispositivo"
+
+#: usr/lib/enigma2/python/Plugins/Extensions/SimpleUmount/plugin.py:130
+msgid "Really umount device"
+msgstr "Smontare il dispositivo?"
+
+#: usr/lib/enigma2/python/Plugins/Extensions/SimpleUmount/plugin.py:195
+msgid "SimpleUmount"
+msgstr "SimpleUmount"
+
+#: usr/lib/enigma2/python/Plugins/Extensions/SimpleUmount/plugin.py:195
+msgid "Simple mass storage umounter extension"
+msgstr "Semplice umount per dispositivi di memorizzazione di massa"
+
+#~ msgid "WARNING: cannot read any mount point"
+#~ msgstr "WARNING: non leggo nessun punto di mount"
+
+#~ msgid "probably no mass storage device inserted"
+#~ msgstr "forse non è inserito alcun device"
